@@ -6,6 +6,13 @@ module "backup_config" {
   name                  = "recovery-vault-test"
   sku                   = "Standard"
 
+  backup_policy = {
+    "test" = {
+      time      = "23:00"
+      frequency = "Daily"
+    }
+  }
+
   tags = {
     "test" = "test"
   }
