@@ -3,7 +3,7 @@ module "backup_config" {
   create_resource_group  = true
   resource_group_name    = "test-rg"
   location_name          = "eastus"
-  name = "rsv_test"
+  name = "recovery-vault-test"
 
   tags = {
     "test" = "test"
