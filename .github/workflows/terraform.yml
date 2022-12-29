@@ -1,0 +1,131 @@
+name: Terraform Analysis
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - prod
+
+env:
+  TF_VAR_AZURE_SUBSCRIPTION_ID: ${{ secrets.DEV_AZURE_SUBSCRIPTION_ID }}
+  TF_VAR_AZURE_CLIENT_ID: ${{ secrets.DEV_AZURE_CLIENT_ID }}
+  TF_VAR_AZURE_CLIENT_SECRET: ${{ secrets.DEV_AZURE_CLIENT_SECRET }}
+  TF_VAR_AZURE_TENANT_ID: ${{ secrets.DEV_AZURE_TENANT_ID }}
+
+jobs:
+  plan_job:
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    name: "Plan phase"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+
+      - name: Terraform Init
+        id: init
+        run: terraform -chdir="./test" init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform -chdir="./test" validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform -chdir="./test" plan -no-color -compact-warnings
+        continue-on-error: true
+
+      - name: "Comment on PR"
+        uses: actions/github-script@v6
+        env:
+          ECODE: "Exit Code: ${{ steps.plan.outputs.exitcode }}"
+          PLAN: "Plan results: \n${{ steps.plan.outputs.stdout }}"
+          ERROR: "Errors in plan: \n${{ steps.plan.outputs.stderr }}"
+        with:
+          github-token: ${{ secrets.ACTIONS_COMMENTS }}
+          script: |
+            // 1. Retrieve existing bot comments for the PR
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            })
+            const botComment = comments.find(comment => {
+              return comment.user.login === 'orion-global-bot' && comment.body.includes('Terrafom Analysis')
+            })
+
+            // 2. Prepare format of the comment
+            const output = `
+            ## Terrafom Analysis ⚙️
+
+            | Format & Style               | Init                          | Validation                        | Plan                          |
+            | ---------------------------- | ----------------------------- | --------------------------------- | ----------------------------- |
+            | \`${{ steps.fmt.outcome }}\` | \`${{ steps.init.outcome }}\` | \`${{ steps.validate.outcome }}\` | \`${{ steps.plan.outcome }}\` |
+
+            ### Validation details:
+            <details><summary>Output</summary>
+
+            \`\`\`\n
+            ${{ steps.validate.outputs.stdout }}
+            \`\`\`
+
+            </details>
+
+            ### Plan details:
+            <details><summary>Output</summary>
+
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
+
+            </details>
+
+            ### Errors:
+            <details><summary>Output</summary>
+
+            \`\`\`\n
+            ${process.env.ERROR}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            // 3. If we have a comment, update it, otherwise create a new one
+            if (botComment) {
+              github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: output
+              })
+            } else {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: output
+              })
+            }
+
+      - name: Evaluate the results
+        shell: pwsh
+        env:
+          PLAN: "${{ steps.plan.outcome }}"
+        run: |
+          if ($ENV:PLAN -eq "Failure" ) {
+              Write-Output "Failed planning for Terraform"
+              exit 1
+          }
+          else {
+              Write-Output "Snyk doesn't found issues. Passing the checks."
+              exit 0
+          }

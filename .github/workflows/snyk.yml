@@ -1,0 +1,158 @@
+name: Snyk Analysis
+on: [pull_request]
+jobs:
+  files:
+    runs-on: ubuntu-latest
+    name: Evaluate files
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Determining the types of checks
+        id: files
+        shell: pwsh
+        run: |
+          $TERRA_SCAN = (Get-ChildItem -Recurse | Where {$_.Name -like "*.tf"} | Measure-Object).Count
+          if($TERRA_SCAN -gt 0) {
+            Write-Output "TERRA_SCAN=true" | Out-File -FilePath $ENV:GITHUB_OUTPUT -Encoding utf8 -Append
+          }
+          else {
+            Write-Output "TERRA_SCAN=false" | Out-File -FilePath $ENV:GITHUB_OUTPUT -Encoding utf8 -Append
+          }
+
+          $PYTHON_SCAN = (Get-ChildItem -Recurse | Where {$_.Name -like "*.py"} | Measure-Object).Count
+          if($PYTHON_SCAN -gt 0) {
+            Write-Output "PYTHON_SCAN=true" | Out-File -FilePath $ENV:GITHUB_OUTPUT -Encoding utf8 -Append
+          }
+          else {
+            Write-Output "PYTHON_SCAN=false" | Out-File -FilePath $ENV:GITHUB_OUTPUT -Encoding utf8 -Append
+          }
+    outputs:
+      TERRA_SCAN: ${{ steps.files.outputs.TERRA_SCAN }}
+      PYTHON_SCAN: ${{ steps.files.outputs.PYTHON_SCAN }}
+
+  snyk_iac:
+    runs-on: ubuntu-latest
+    name: Snyk Scan for IaC
+    needs: files
+    if: needs.files.outputs.TERRA_SCAN == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run Snyk to check configuration files for security issues
+        continue-on-error: true
+        uses: snyk/actions/iac@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --json-file-output=snyk.json
+          file: test/
+          json: true
+          sarif: false
+
+      - name: Get Snyk results
+        id: snyk_results
+        continue-on-error: true
+        uses: orion-global/actions/snyk_results@v1.0.0
+        with:
+          file_name: snyk.json
+
+      - name: Reporting status
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.ACTIONS_COMMENTS }}
+          script: |
+            // 1. Retrieve existing bot comments for the PR
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            })
+            const botComment = comments.find(comment => {
+              return comment.user.login === 'orion-global-bot' && comment.body.includes('Snyk Analysis for IaC')
+            })
+
+            // 2. Prepare format of the comment
+            const fs = JSON.parse(require('fs').readFileSync('snyk.json'))
+
+            const output = `
+            ## Snyk Analysis for IaC 🤖
+
+            | Status                                      | Repository                          | Total Issues                                  |
+            | ------------------------------------------- | ----------------------------------- | --------------------------------------------- |
+            | \`${{ steps.snyk_results.outputs.status}}\` | ${{ github.event.repository.name }} | ${{ steps.snyk_results.outputs.total_issues}} |
+            ### Issues:
+            - **Critical**: ${{ steps.snyk_results.outputs.total_critical_issues }} issues.
+            - **High**: ${{ steps.snyk_results.outputs.total_high_issues }} issues.
+            - Medium: ${{ steps.snyk_results.outputs.total_medium_issues }} issues.
+            - Low: ${{ steps.snyk_results.outputs.total_low_issues }} issues.
+
+            ### Processed files (${{ steps.snyk_results.outputs.total_scanned_files}}):
+            ${{ steps.snyk_results.outputs.list_files}}
+
+            <details><summary>Show details of analysis:</summary>
+
+            \`\`\`\n
+            ----------------------------------------
+            |            Critical Issues           |
+            ----------------------------------------\n
+            ${{ steps.snyk_results.outputs.list_critical_issues}}
+
+            ----------------------------------------
+            |              High Issues             |
+            ----------------------------------------\n
+            ${{ steps.snyk_results.outputs.list_high_issues}}
+
+            ----------------------------------------
+            |             Medium Issues            |
+            ----------------------------------------\n
+            ${{ steps.snyk_results.outputs.list_medium_issues}}
+
+            ----------------------------------------
+            |              Low Issues              |
+            ----------------------------------------\n
+            ${{ steps.snyk_results.outputs.list_low_issues}}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            // 3. If we have a comment, update it, otherwise create a new one
+            if (botComment) {
+              github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: output
+              })
+            } else {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: output
+              })
+            }
+
+      - name: Evaluate the results
+        shell: pwsh
+        env:
+          NUMBER_CRITICAL_ISSUES: "${{ steps.snyk_results.outputs.total_critical_issues }}"
+          NUMBER_HIGH_ISSUES: "${{ steps.snyk_results.outputs.total_high_issues }}"
+          NUMBER_MEDIUM_ISSUES: "${{ steps.snyk_results.outputs.total_medium_issues }}"
+          NUMBER_LOW_ISSUES: "${{ steps.snyk_results.outputs.total_low_issues }}"
+        run: |
+          if ($ENV:NUMBER_CRITICAL_ISSUES -gt 0 -or $ENV:NUMBER_HIGH_ISSUES -gt 0) {
+              Write-Output "Snyk found issues. Failing the checks."
+              exit 1
+          }
+          elseif ($ENV:NUMBER_MEDIUM_ISSUES -gt 0 -or $ENV:NUMBER_LOW_ISSUES -gt 0) {
+              Write-Output "Synk found problems, but classified them as medium and low. It is possible to continue. Please check them."
+              exit 0
+          }
+          else {
+              Write-Output "Snyk doesn't found issues. Passing the checks."
+              exit 0
+          }
