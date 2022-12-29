@@ -4,7 +4,7 @@ module "backup_config" {
   resource_group_name   = "test-rg"
   location_name         = "eastus"
   name                  = "recovery-vault-test"
-  sku_name              = "Standard"
+  sku                   = "Standard"
 
   tags = {
     "test" = "test"
