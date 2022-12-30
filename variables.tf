@@ -62,11 +62,6 @@ variable "cross_region_restore_enabled" {
   description = "(Optional) Is cross region restore enabled for this Vault? Only can be true is the storage mode is GeoRedundant."
   type        = bool
   default     = null
-
-  validation {
-    condition     = var.storage_mode != "GeoRedundant" && var.cross_region_restore_enabled == true
-    error_message = "Cross region restore can only be enabled if the storage mode is GeoRedundant."
-  }
 }
 
 #------------------------------------------------------------------------------------------

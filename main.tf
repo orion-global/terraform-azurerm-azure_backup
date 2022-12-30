@@ -47,6 +47,13 @@ resource "azurerm_recovery_services_vault" "recovery_vault" {
     azurerm_resource_group.resource_group,
     data.azurerm_resource_group.resource_group
   ]
+
+  lifecycle {
+    precondition {
+      condition     = var.storage_mode != "GeoRedundant" && var.cross_region_restore_enabled == true
+      error_message = "Cross region restore can only be enabled if the storage mode is GeoRedundant."
+    }
+  }
 }
 
 resource "azurerm_backup_policy_vm" "backup_policy" {
