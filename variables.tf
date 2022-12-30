@@ -62,7 +62,7 @@ variable "backup_policy" {
     retention = optional(map(object({
       days       = optional(number)
       weeks      = optional(number)
-      weeks_days = optional(tuple(string))
+      weeks_days = optional(tuple)
     })))
   }))
 }
