@@ -71,29 +71,20 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
     time      = each.value.time
   }
 
-  # retention_daily - (Optional) Configures the policy daily retention as documented in the retention_daily block below. Required when backup frequency is Daily.
-  #   count - (Required) The number of daily backups to keep. Must be between 7 and 9999.
-  #   ~> Note: Azure previously allows this field to be set to a minimum of 1 (day) - but for new resources/to update this value on existing Backup Policies - this value must now be at least 7 (days).
-
-  # retention_daily {
-  #   count = each.value.retention_days
-  # }
-
   dynamic "retention_daily" {
-    for_each = each.value.frequency == "Daily" ? [""] : []
+    for_each = each.value.frequency == "Daily" || each.value.retention.days != null ? [""] : []
     content {
-      count = each.value.retention_days
+      count = each.value.retention.days
     }
   }
 
-  # retention_weekly - (Optional) Configures the policy weekly retention as documented in the retention_weekly block below. Required when backup frequency is Weekly.
-  #   count - (Required) The number of weekly backups to keep. Must be between 1 and 9999
-  #   weekdays - (Required) The weekday backups to retain. Must be one of Sunday, Monday, Tuesday, Wednesday, Thursday, Friday or Saturday.
-
-  # retention_weekly {
-  #   count    = each.value.retention_weeks
-  #   weekdays = each.value.retention_weeks_days
-  # }
+  dynamic "retention_weekly" {
+    for_each = each.value.frequency == "Weekly" || each.value.retention.weeks != null ? [""] : []
+    content {
+      count    = each.value.retention.weeks
+      weekdays = each.value.retention.weeks_days
+    }
+  }
 
   # retention_monthly - (Optional) Configures the policy monthly retention as documented in the retention_monthly block below.
   #   count - (Required) The number of monthly backups to keep. Must be between 1 and 9999
