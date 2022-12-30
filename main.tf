@@ -73,20 +73,20 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
     time      = each.value.time
   }
 
-  dynamic "retention_daily" {
-    for_each = (each.value.frequency == "Dayli" ? [""] : [])
-    content {
-      count = each.value.retention_days
-    }
-  }
+  # dynamic "retention_daily" {
+  #   for_each = (each.value.frequency == "Dayli" ? [""] : [])
+  #   content {
+  #     count = each.value.retention_days
+  #   }
+  # }
 
   # retention_daily - (Optional) Configures the policy daily retention as documented in the retention_daily block below. Required when backup frequency is Daily.
   #   count - (Required) The number of daily backups to keep. Must be between 7 and 9999.
   #   ~> Note: Azure previously allows this field to be set to a minimum of 1 (day) - but for new resources/to update this value on existing Backup Policies - this value must now be at least 7 (days).
 
-  # retention_daily {
-  #   count = 10
-  # }
+  retention_daily {
+    count = each.value.retention_days
+  }
 
   # retention_weekly - (Optional) Configures the policy weekly retention as documented in the retention_weekly block below. Required when backup frequency is Weekly.
   #   count - (Required) The number of weekly backups to keep. Must be between 1 and 9999
