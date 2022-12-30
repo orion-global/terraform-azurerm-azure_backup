@@ -49,7 +49,7 @@ module "backup_config" {
   }
 
   protected_azvm = {
-    "/subscriptions/72cd989d-dc0f-46b5-9853-787ab80cf489/resourceGroups/RG-VPN/providers/Microsoft.Compute/virtualMachines/iberth3" = "test"
+    "/subscriptions/7XXdXX9d-XXXX-XXXX-XXXX-787XX8XXf4XX/resourceGroups/RXXXXXXXX/providers/Microsoft.Compute/virtualMachines/XXXXX" = "test"
   }
 
 
