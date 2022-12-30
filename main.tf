@@ -3,7 +3,6 @@
 #------------------------------------------------------------------------------------------
 
 locals {
-
 }
 
 #------------------------------------------------------------------------------------------
@@ -56,15 +55,8 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
   resource_group_name            = var.resource_group_name
   recovery_vault_name            = azurerm_recovery_services_vault.recovery_vault.name
   timezone                       = each.value.timezone
-  policy_type                    = each.value.policy_type
+  policy_type                    = each.value.frequency == "Hourly" ? "V2" : each.value.policy_type
   instant_restore_retention_days = each.value.instant_days
-
-  # The backup block supports:
-  #   ~> NOTE: hour_duration must be multiplier of hour_interval
-  #   hour_duration - (Optional) Duration of the backup window in hours. Possible values are between 4 and 24 This is used when frequency is Hourly.
-  #   hour_interval - (Optional) Interval in hour at which backup is triggered. Possible values are 4, 6, 8 and 12. This is used when frequency is Hourly.
-  #   weekdays - (Optional) The days of the week to perform backups on. Must be one of Sunday, Monday, Tuesday, Wednesday, Thursday, Friday or Saturday. This is used when frequency is Weekly.
-
 
   dynamic "backup" {
     for_each = each.value.frequency == "Hourly" || each.value.hour_duration != null || each.value.hour_interval != null ? [""] : []
