@@ -86,16 +86,14 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
     }
   }
 
-  # retention_monthly - (Optional) Configures the policy monthly retention as documented in the retention_monthly block below.
-  #   count - (Required) The number of monthly backups to keep. Must be between 1 and 9999
-  #   weekdays - (Required) The weekday backups to retain . Must be one of Sunday, Monday, Tuesday, Wednesday, Thursday, Friday or Saturday.
-  #   weeks - (Required) The weeks of the month to retain backups of. Must be one of First, Second, Third, Fourth, Last.
-
-  # retention_monthly {
-  #   count    = 7
-  #   weekdays = ["Sunday", "Wednesday"]
-  #   weeks    = ["First", "Last"]
-  # }
+  dynamic "retention_monthly" {
+    for_each = each.value.retention.months != null ? [""] : []
+    content {
+      count    = each.value.retention.months
+      weekdays = each.value.retention.months_weekdays
+      weeks    = each.value.retention.months_weeks
+    }
+  }
 
   # retention_yearly - (Optional) Configures the policy yearly retention as documented in the retention_yearly block below.
   #   count - (Required) The number of yearly backups to keep. Must be between 1 and 9999

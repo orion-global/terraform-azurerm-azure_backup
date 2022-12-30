@@ -60,9 +60,12 @@ variable "backup_policy" {
     frequency   = string
     policy_type = optional(string)
     retention = optional(object({
-      days       = optional(number)
-      weeks      = optional(number)
-      weeks_days = optional(list(string))
+      days            = optional(number)
+      weeks           = optional(number)
+      weeks_days      = optional(list(string))
+      months          = optional(number)
+      months_weekdays = optional(list(string))
+      months_weeks    = optional(list(string))
     }))
   }))
 }

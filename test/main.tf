@@ -11,9 +11,12 @@ module "backup_config" {
       time      = "23:00"
       frequency = "Daily"
       retention = {
-        days       = 30
-        weeks      = 2
-        weeks_days = ["Sunday", "Wednesday", "Friday", "Saturday"]
+        days = 30
+        # weeks           = 2
+        # weeks_days      = ["Sunday", "Wednesday", "Friday", "Saturday"]
+        months          = 2
+        months_weekdays = ["Sunday", "Wednesday"]
+        months_weeks    = ["First", "Last"]
       }
     }
   }
