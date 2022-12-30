@@ -55,17 +55,15 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
   name                = each.key
   resource_group_name = var.resource_group_name
   recovery_vault_name = azurerm_recovery_services_vault.recovery_vault.name
-  timezone            = each.value[timezone]
+  timezone            = each.value.timezone
   policy_type         = each.value.policy_type
 
   # instant_restore_retention_days - (Optional) Specifies the instant restore retention range in days. Possible values are between 1 and 5 when policy_type is V1, and 1 to 30 when policy_type is V2.
 
   # The backup block supports:
   #   ~> NOTE: hour_duration must be multiplier of hour_interval
-  #   frequency - (Required) Sets the backup frequency. Possible values are Hourly, Daily and Weekly.
   #   hour_duration - (Optional) Duration of the backup window in hours. Possible values are between 4 and 24 This is used when frequency is Hourly.
   #   hour_interval - (Optional) Interval in hour at which backup is triggered. Possible values are 4, 6, 8 and 12. This is used when frequency is Hourly.
-  #   time - (Required) The time of day to perform the backup in 24hour format.
   #   weekdays - (Optional) The days of the week to perform backups on. Must be one of Sunday, Monday, Tuesday, Wednesday, Thursday, Friday or Saturday. This is used when frequency is Weekly.
 
   backup {
@@ -73,19 +71,19 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
     time      = each.value.time
   }
 
-  # dynamic "retention_daily" {
-  #   for_each = (each.value.frequency == "Dayli" ? var.backup_policy["${each.key}"] : [])
-  #   content {
-  #     count = each.value.retention_days
-  #   }
-  # }
-
   # retention_daily - (Optional) Configures the policy daily retention as documented in the retention_daily block below. Required when backup frequency is Daily.
   #   count - (Required) The number of daily backups to keep. Must be between 7 and 9999.
   #   ~> Note: Azure previously allows this field to be set to a minimum of 1 (day) - but for new resources/to update this value on existing Backup Policies - this value must now be at least 7 (days).
 
-  retention_daily {
-    count = each.value.retention_days
+  # retention_daily {
+  #   count = each.value.retention_days
+  # }
+
+  dynamic "retention_daily" {
+    for_each = var.retention_dayli
+    content {
+      count = each.value.days
+    }
   }
 
   # retention_weekly - (Optional) Configures the policy weekly retention as documented in the retention_weekly block below. Required when backup frequency is Weekly.
