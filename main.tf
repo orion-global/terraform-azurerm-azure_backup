@@ -26,18 +26,18 @@ data "azurerm_resource_group" "resource_group" {
 #------------------------------------------------------------------------------------------
 
 resource "azurerm_recovery_services_vault" "recovery_vault" {
-  name                = var.name
-  location            = var.location_name
-  resource_group_name = var.resource_group_name
-  sku                 = var.sku
-  soft_delete_enabled = var.soft_delete_enabled
-  tags                = var.tags
+  name                         = var.name
+  location                     = var.location_name
+  resource_group_name          = var.resource_group_name
+  sku                          = var.sku
+  soft_delete_enabled          = var.soft_delete_enabled
+  tags                         = var.tags
+  storage_mode_type            = var.storage_mode
+  cross_region_restore_enabled = var.storage_mode != "GeoRedundant" ? false : var.cross_region_restore_enabled
 
   # identity	                    (Optional) Anidentityblock as defined below.	
   #     An identity block supports the following:
   #     type - (Required) Specifies the type of Managed Service Identity that should be configured on this Recovery Services Vault. The only possible value is SystemAssigned.
-  # storage_mode_type	            (Optional) The storage type of the Recovery Services Vault. Possible values areGeoRedundant,LocallyRedundantandZoneRedundant. Defaults toGeoRedundant.	
-  # cross_region_restore_enabled	(Optional) Is cross region restore enabled for this Vault? Only can betrue, whenstorage_mode_typeisGeoRedundant. Defaults tofalse.	
   # encryption block supports the following:
   #     key_id - (Required) The Key Vault key id used to encrypt this vault. Key managed by Vault Managed Hardware Security Module is also supported.
   #     infrastructure_encryption_enabled - (Required) Enabling/Disabling the Double Encryption state.
