@@ -8,8 +8,9 @@ module "backup_config" {
 
   backup_policy = {
     "test" = {
-      time      = "23:00"
-      frequency = "Daily"
+      time           = "23:00"
+      frequency      = "Daily"
+      retention_days = 30
     }
   }
 

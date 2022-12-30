@@ -73,14 +73,12 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
     time      = each.value.time
   }
 
-  # dynamic "backup" {
-  #   for_each = (var.type == "peering" && var.peer_network != null ? [""] : [])
-  #   content {
-  #     target_network {
-  #       network_url = var.peer_network
-  #     }
-  #   }
-  # }
+  dynamic "retention_daily" {
+    for_each = (each.value.frequency == "Dayli" ? [""] : [])
+    content {
+      count = each.value.retention_days
+    }
+  }
 
   # retention_daily - (Optional) Configures the policy daily retention as documented in the retention_daily block below. Required when backup frequency is Daily.
   #   count - (Required) The number of daily backups to keep. Must be between 7 and 9999.
