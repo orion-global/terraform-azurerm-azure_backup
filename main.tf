@@ -92,10 +92,10 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
   #   count - (Required) The number of weekly backups to keep. Must be between 1 and 9999
   #   weekdays - (Required) The weekday backups to retain. Must be one of Sunday, Monday, Tuesday, Wednesday, Thursday, Friday or Saturday.
 
-  # retention_weekly {
-  #   count    = 42
-  #   weekdays = ["Sunday", "Wednesday", "Friday", "Saturday"]
-  # }
+  retention_weekly {
+    count    = each.value.retention_weeks
+    weekdays = each.value.retention_weeks_days
+  }
 
   # retention_monthly - (Optional) Configures the policy monthly retention as documented in the retention_monthly block below.
   #   count - (Required) The number of monthly backups to keep. Must be between 1 and 9999
