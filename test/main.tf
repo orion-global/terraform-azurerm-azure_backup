@@ -5,7 +5,6 @@ module "backup_config" {
   location_name         = "eastus"
   name                  = "recovery-vault-test"
   sku                   = "Standard"
-  hour_interval         = 1
   backup_policy = {
     "test" = {
       time          = "23:00"
