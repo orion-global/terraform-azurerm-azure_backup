@@ -47,14 +47,11 @@ resource "azurerm_recovery_services_vault" "recovery_vault" {
     azurerm_resource_group.resource_group,
     data.azurerm_resource_group.resource_group
   ]
-
-  lifecycle {
-    precondition {
-      condition     = var.storage_mode != "GeoRedundant" && var.cross_region_restore_enabled == true
-      error_message = "Cross region restore can only be enabled if the storage mode is GeoRedundant."
-    }
-  }
 }
+
+#------------------------------------------------------------------------------------------
+# Azure VM Backup Policy
+#------------------------------------------------------------------------------------------
 
 resource "azurerm_backup_policy_vm" "backup_policy" {
   for_each                       = var.backup_policy
@@ -120,4 +117,16 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
   depends_on = [
     azurerm_recovery_services_vault.recovery_vault
   ]
+}
+
+#------------------------------------------------------------------------------------------
+# Protected Azure VM
+#------------------------------------------------------------------------------------------
+
+resource "azurerm_backup_protected_vm" "protected_azvm" {
+  for_each            = var.protected_azvm
+  resource_group_name = var.resource_group_name
+  recovery_vault_name = azurerm_recovery_services_vault.recovery_vault.name
+  source_vm_id        = each.key
+  backup_policy_id    = azurerm_backup_policy_vm.backup_policy["${each.value.policy}"].id
 }

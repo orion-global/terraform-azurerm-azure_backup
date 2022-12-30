@@ -48,6 +48,11 @@ module "backup_config" {
     }
   }
 
+  protected_azvm = {
+    "/subscriptions/72cd989d-dc0f-46b5-9853-787ab80cf489/resourceGroups/RG-VPN/providers/Microsoft.Compute/virtualMachines/iberth3" = "test"
+  }
+
+
   tags = {
     "test" = "test"
   }
