@@ -129,4 +129,7 @@ resource "azurerm_backup_protected_vm" "protected_azvm" {
   recovery_vault_name = azurerm_recovery_services_vault.recovery_vault.name
   source_vm_id        = each.key
   backup_policy_id    = azurerm_backup_policy_vm.backup_policy["${each.value}"].id
+
+  # exclude_disk_luns - (Optional) A list of Disks' Logical Unit Numbers(LUN) to be excluded for VM Protection.
+  # include_disk_luns - (Optional) A list of Disks' Logical Unit Numbers(LUN) to be included for VM Protection.
 }
