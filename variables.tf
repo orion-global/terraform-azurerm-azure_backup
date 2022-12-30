@@ -59,11 +59,13 @@ variable "soft_delete_enabled" {
 variable "backup_policy" {
   description = "A list of network interface IDs to attach to the VM."
   type = map(object({
-    timezone     = optional(string)
-    time         = string
-    frequency    = string
-    policy_type  = optional(string)
-    instant_days = optional(number)
+    timezone      = optional(string)
+    time          = string
+    frequency     = string
+    policy_type   = optional(string)
+    instant_days  = optional(number)
+    hour_interval = optional(number)
+    hour_duration = optional(number)
     retention = optional(object({
       days            = optional(number)
       weeks           = optional(number)

@@ -67,7 +67,7 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
 
 
   dynamic "backup" {
-    for_each = each.value.hour_duration != null || each.value.hour_interval != nulll ? [""] : []
+    for_each = each.value.hour_duration != null || each.value.hour_interval != null ? [""] : []
     content {
       frequency     = each.value.frequency
       time          = each.value.time
@@ -77,7 +77,7 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
   }
 
   dynamic "backup" {
-    for_each = each.value.hour_duration == null || each.value.hour_interval == nulll ? [""] : []
+    for_each = each.value.hour_duration == null || each.value.hour_interval == null ? [""] : []
     content {
       frequency = each.value.frequency
       time      = each.value.time
