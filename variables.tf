@@ -66,6 +66,10 @@ variable "backup_policy" {
       months          = optional(number)
       months_weekdays = optional(list(string))
       months_weeks    = optional(list(string))
+      years           = optional(number)
+      years_weekdays  = optional(list(string))
+      years_weeks     = optional(list(string))
+      years_months    = optional(list(string))
     }))
   }))
 }

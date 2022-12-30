@@ -95,18 +95,15 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
     }
   }
 
-  # retention_yearly - (Optional) Configures the policy yearly retention as documented in the retention_yearly block below.
-  #   count - (Required) The number of yearly backups to keep. Must be between 1 and 9999
-  #   weekdays - (Required) The weekday backups to retain . Must be one of Sunday, Monday, Tuesday, Wednesday, Thursday, Friday or Saturday.
-  #   weeks - (Required) The weeks of the month to retain backups of. Must be one of First, Second, Third, Fourth, Last.
-  #   months - (Required) The months of the year to retain backups of. Must be one of January, February, March, April, May, June, July, August, September, October, November and December.
-
-  # retention_yearly {
-  #   count    = 77
-  #   weekdays = ["Sunday"]
-  #   weeks    = ["Last"]
-  #   months   = ["January"]
-  # }
+  dynamic "retention_yearly" {
+    for_each = each.value.retention.years != null ? [""] : []
+    content {
+      count    = each.value.retention.years
+      weekdays = each.value.retention.years_weekdays
+      weeks    = each.value.retention.years_weeks
+      months   = each.value.retention.years_months
+    }
+  }
 
   depends_on = [
     azurerm_recovery_services_vault.recovery_vault

@@ -17,6 +17,10 @@ module "backup_config" {
         months          = 2
         months_weekdays = ["Sunday", "Wednesday"]
         months_weeks    = ["First", "Last"]
+        years           = 77
+        years_weekdays  = ["Sunday"]
+        years_weeks     = ["Last"]
+        years_months    = ["January"]
       }
     }
   }
