@@ -117,6 +117,17 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
   depends_on = [
     azurerm_recovery_services_vault.recovery_vault
   ]
+
+  lifecycle {
+    ignore_changes = [
+      retention_monthly["weekdays"],
+      retention_monthly["weeks"],
+      retention_yearly["months"],
+      retention_yearly["weeks"],
+      retention_yearly["weekdays"]
+    ]
+  }
+
 }
 
 #------------------------------------------------------------------------------------------
