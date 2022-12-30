@@ -128,5 +128,5 @@ resource "azurerm_backup_protected_vm" "protected_azvm" {
   resource_group_name = var.resource_group_name
   recovery_vault_name = azurerm_recovery_services_vault.recovery_vault.name
   source_vm_id        = each.key
-  backup_policy_id    = azurerm_backup_policy_vm.backup_policy["${each.value.policy}"].id
+  backup_policy_id    = azurerm_backup_policy_vm.backup_policy["${each.value}"].id
 }
