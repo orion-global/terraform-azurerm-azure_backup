@@ -65,9 +65,23 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
   #   hour_interval - (Optional) Interval in hour at which backup is triggered. Possible values are 4, 6, 8 and 12. This is used when frequency is Hourly.
   #   weekdays - (Optional) The days of the week to perform backups on. Must be one of Sunday, Monday, Tuesday, Wednesday, Thursday, Friday or Saturday. This is used when frequency is Weekly.
 
-  backup {
-    frequency = each.value.frequency
-    time      = each.value.time
+
+  dynamic "backup" {
+    for_each = each.value.hour_duration != null || each.value.hour_interval != nulll ? [""] : []
+    content {
+      frequency     = each.value.frequency
+      time          = each.value.time
+      hour_interval = each.value.hour_interval
+      hour_duration = each.value.hour_duration
+    }
+  }
+
+  dynamic "backup" {
+    for_each = each.value.hour_duration == null || each.value.hour_interval == nulll ? [""] : []
+    content {
+      frequency = each.value.frequency
+      time      = each.value.time
+    }
   }
 
   dynamic "retention_daily" {
