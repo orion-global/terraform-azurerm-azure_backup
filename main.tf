@@ -80,7 +80,7 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
   # }
 
   dynamic "retention_daily" {
-    for_each = var.retention_dayli
+    for_each = each.value.retention_dayli
     content {
       count = each.value.days
     }
