@@ -59,8 +59,8 @@ variable "backup_policy" {
     time        = string
     frequency   = string
     policy_type = optional(string)
-    retention_dayli = optional(map(object({
-      days =number
-    })))
+    retention_dayli = object({
+      days = number
+    })
   }))
 }
