@@ -73,3 +73,9 @@ variable "backup_policy" {
     }))
   }))
 }
+
+variable "instant_days" {
+  description = "(Optional) The number of days to retain the recovery point for instant restore. Defaults to 2."
+  type        = number
+  default     = 2
+}

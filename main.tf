@@ -51,12 +51,13 @@ resource "azurerm_recovery_services_vault" "recovery_vault" {
 }
 
 resource "azurerm_backup_policy_vm" "backup_policy" {
-  for_each            = var.backup_policy
-  name                = each.key
-  resource_group_name = var.resource_group_name
-  recovery_vault_name = azurerm_recovery_services_vault.recovery_vault.name
-  timezone            = each.value.timezone
-  policy_type         = each.value.policy_type
+  for_each                       = var.backup_policy
+  name                           = each.key
+  resource_group_name            = var.resource_group_name
+  recovery_vault_name            = azurerm_recovery_services_vault.recovery_vault.name
+  timezone                       = each.value.timezone
+  policy_type                    = each.value.policy_type
+  instant_restore_retention_days = each.value.instant_days
 
   # instant_restore_retention_days - (Optional) Specifies the instant restore retention range in days. Possible values are between 1 and 5 when policy_type is V1, and 1 to 30 when policy_type is V2.
 
