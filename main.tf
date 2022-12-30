@@ -59,8 +59,6 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
   policy_type                    = each.value.policy_type
   instant_restore_retention_days = each.value.instant_days
 
-  # instant_restore_retention_days - (Optional) Specifies the instant restore retention range in days. Possible values are between 1 and 5 when policy_type is V1, and 1 to 30 when policy_type is V2.
-
   # The backup block supports:
   #   ~> NOTE: hour_duration must be multiplier of hour_interval
   #   hour_duration - (Optional) Duration of the backup window in hours. Possible values are between 4 and 24 This is used when frequency is Hourly.

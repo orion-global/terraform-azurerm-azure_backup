@@ -52,13 +52,18 @@ variable "soft_delete_enabled" {
   default     = true
 }
 
+#------------------------------------------------------------------------------------------
+# Policy variables
+#------------------------------------------------------------------------------------------
+
 variable "backup_policy" {
   description = "A list of network interface IDs to attach to the VM."
   type = map(object({
-    timezone    = optional(string)
-    time        = string
-    frequency   = string
-    policy_type = optional(string)
+    timezone     = optional(string)
+    time         = string
+    frequency    = string
+    policy_type  = optional(string)
+    instant_days = optional(number)
     retention = optional(object({
       days            = optional(number)
       weeks           = optional(number)
@@ -72,10 +77,4 @@ variable "backup_policy" {
       years_months    = optional(list(string))
     }))
   }))
-}
-
-variable "instant_days" {
-  description = "(Optional) The number of days to retain the recovery point for instant restore. Defaults to 2."
-  type        = number
-  default     = 2
 }
