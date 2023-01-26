@@ -29,10 +29,12 @@ module "backup_config" {
       }
     }
     "test2" = {
-      time         = "23:00"
-      frequency    = "Daily"
-      instant_days = 3
-      policy_type  = "V1"
+      time          = "23:00"
+      frequency     = "Daily"
+      instant_days  = 7
+      hour_interval = 4
+      hour_duration = 4
+      policy_type   = "V1"
       retention = {
         days            = 30
         weeks           = 2
