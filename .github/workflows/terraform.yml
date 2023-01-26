@@ -1,4 +1,4 @@
-name: Terraform Analysis
+name: Terraform
 
 on:
   pull_request:
@@ -16,7 +16,7 @@ jobs:
   plan_job:
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
     runs-on: ubuntu-latest
-    name: "Plan phase"
+    name: "Terraform Plan"
     steps:
       - name: Checkout
         uses: actions/checkout@v3

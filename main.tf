@@ -63,7 +63,7 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
   instant_restore_retention_days = each.value.instant_days
 
   dynamic "backup" {
-    for_each = each.value.frequency == "Hourly" || each.value.hour_duration != null || each.value.hour_interval != null ? [""] : []
+    for_each = each.value.frequency == "Hourly" ? [""] : []
     content {
       frequency     = each.value.frequency
       time          = each.value.time
@@ -117,16 +117,6 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
   depends_on = [
     azurerm_recovery_services_vault.recovery_vault
   ]
-
-  lifecycle {
-    ignore_changes = [
-      retention_monthly["weekdays"],
-      retention_monthly["weeks"],
-      retention_yearly["months"],
-      retention_yearly["weeks"],
-      retention_yearly["weekdays"]
-    ]
-  }
 
 }
 
