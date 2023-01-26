@@ -1,4 +1,4 @@
-name: Infracost Analysis
+name: Infracost
 
 # The GitHub Actions docs (https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#on)
 # describe other options for 'on', 'pull_request' is a good default.
@@ -10,7 +10,7 @@ env:
   INFRACOST_LOG_LEVEL: debug
 jobs:
   infracost:
-    name: Infracost
+    name: Infracost Analysis
     runs-on: ubuntu-latest
     permissions:
       contents: read

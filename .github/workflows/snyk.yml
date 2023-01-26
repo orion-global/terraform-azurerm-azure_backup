@@ -1,4 +1,4 @@
-name: Snyk Analysis
+name: Snyk
 on: [pull_request]
 jobs:
   snyk_iac:
