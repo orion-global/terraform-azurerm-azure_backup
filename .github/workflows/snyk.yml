@@ -5,7 +5,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Snyk Scan for IaC
     needs: files
-    if: needs.files.outputs.TERRA_SCAN == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
