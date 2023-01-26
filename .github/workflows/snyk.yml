@@ -1,37 +1,9 @@
 name: Snyk Analysis
 on: [pull_request]
 jobs:
-  files:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Determining the types of checks
-        id: files
-        shell: pwsh
-        run: |
-          $TERRA_SCAN = (Get-ChildItem -Recurse | Where {$_.Name -like "*.tf"} | Measure-Object).Count
-          if($TERRA_SCAN -gt 0) {
-            Write-Output "TERRA_SCAN=true" | Out-File -FilePath $ENV:GITHUB_OUTPUT -Encoding utf8 -Append
-          }
-          else {
-            Write-Output "TERRA_SCAN=false" | Out-File -FilePath $ENV:GITHUB_OUTPUT -Encoding utf8 -Append
-          }
-
-          $PYTHON_SCAN = (Get-ChildItem -Recurse | Where {$_.Name -like "*.py"} | Measure-Object).Count
-          if($PYTHON_SCAN -gt 0) {
-            Write-Output "PYTHON_SCAN=true" | Out-File -FilePath $ENV:GITHUB_OUTPUT -Encoding utf8 -Append
-          }
-          else {
-            Write-Output "PYTHON_SCAN=false" | Out-File -FilePath $ENV:GITHUB_OUTPUT -Encoding utf8 -Append
-          }
-    outputs:
-      TERRA_SCAN: ${{ steps.files.outputs.TERRA_SCAN }}
-      PYTHON_SCAN: ${{ steps.files.outputs.PYTHON_SCAN }}
-
   snyk_iac:
     runs-on: ubuntu-latest
+    name: Snyk Scan for IaC
     needs: files
     if: needs.files.outputs.TERRA_SCAN == 'true'
     steps:
