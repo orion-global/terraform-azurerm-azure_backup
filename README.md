@@ -116,7 +116,7 @@ No modules.
 | <a name="input_cross_region_restore_enabled"></a> [cross\_region\_restore\_enabled](#input\_cross\_region\_restore\_enabled) | (Optional) Is cross region restore enabled for this Vault? Only can be true is the storage mode is GeoRedundant. | `bool` | `null` | no |
 | <a name="input_location_name"></a> [location\_name](#input\_location\_name) | (Required) Specifies the supported Azure location where the resource exists. Changing this forces a new resource to be created. | `string` | `null` | no |
 | <a name="input_name"></a> [name](#input\_name) | (Required) Specifies the name of the Recovery Services Vault. Changing this forces a new resource to be created. | `string` | `null` | no |
-| <a name="input_protected_azvm"></a> [protected\_azvm](#input\_protected\_azvm) | A list of virtual machine IDs to protect with the policy. | `map(any)` | n/a | yes |
+| <a name="input_protected_azvm"></a> [protected\_azvm](#input\_protected\_azvm) | A list of virtual machine IDs to protect with the policy. | `map(any)` | `{}` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | (Required) The name of the resource group in which to create the Container Registry. Changing this forces a new resource to be created. | `string` | `null` | no |
 | <a name="input_sku"></a> [sku](#input\_sku) | (Required) Sets the vault's SKU. Possible values include: Standard, RS0. | `string` | `null` | no |
 | <a name="input_soft_delete_enabled"></a> [soft\_delete\_enabled](#input\_soft\_delete\_enabled) | (Optional) Is soft delete enable for this Vault? Defaults to true. | `bool` | `true` | no |
