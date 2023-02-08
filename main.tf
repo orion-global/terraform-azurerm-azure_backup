@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------------------
 
 locals {
-  _protected_azvm = var.protected_azvm ? var.protected_azvm : {}
+  _protected_azvm = length(var.protected_azvm) > 0 ? var.protected_azvm : {}
 }
 
 #------------------------------------------------------------------------------------------
