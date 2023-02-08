@@ -2,7 +2,7 @@
 
 repository:
   topics: terraform,terraform-module,registry
-  private: true
+  private: false
   has_issues: true
   has_projects: true
   has_wiki: false

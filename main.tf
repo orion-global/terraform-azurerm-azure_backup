@@ -3,6 +3,7 @@
 #------------------------------------------------------------------------------------------
 
 locals {
+  _protected_azvm = length(var.protected_azvm) > 0 ? var.protected_azvm : {}
 }
 
 #------------------------------------------------------------------------------------------
@@ -125,7 +126,7 @@ resource "azurerm_backup_policy_vm" "backup_policy" {
 #------------------------------------------------------------------------------------------
 
 resource "azurerm_backup_protected_vm" "protected_azvm" {
-  for_each            = var.protected_azvm
+  for_each            = local._protected_azvm
   resource_group_name = var.resource_group_name
   recovery_vault_name = azurerm_recovery_services_vault.recovery_vault.name
   source_vm_id        = each.key
