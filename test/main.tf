@@ -50,11 +50,6 @@ module "backup_config" {
     }
   }
 
-  protected_azvm = {
-    "/subscriptions/7XXdXX9d-XXXX-XXXX-XXXX-787XX8XXf4XX/resourceGroups/RXXXXXXXX/providers/Microsoft.Compute/virtualMachines/XXXXX" = "test"
-  }
-
-
   tags = {
     "test" = "test"
   }
