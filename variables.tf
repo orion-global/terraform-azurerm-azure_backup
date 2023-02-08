@@ -99,5 +99,5 @@ variable "backup_policy" {
 
 variable "protected_azvm" {
   description = "A list of virtual machine IDs to protect with the policy."
-  type        = map(any)
+  type        = optional(map(any))
 }
